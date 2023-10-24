@@ -231,10 +231,9 @@ function Members() {
                                 <th>S.No</th>
                                 <th>Name</th>
                                 <th>Course</th>
-                                <th>Venue</th>
-                                <th>Mode</th>
-                                <th>Date and Time</th>
-                                <th>Images</th>
+                                <th>Position</th>
+                                <th>Order</th>
+                                <th>Is_core</th>
                                 <th>Links</th>
                                 <th>Actions</th>
                             </tr>
@@ -247,33 +246,12 @@ function Members() {
                                             <td>{index + 1}</td>
                                             <td>{member.name}</td>
                                             <td>{member.course}</td>
-                                            <td>{member.venue}</td>
-                                            <td>{member.mode}</td>
+                                            <td>{member.position}</td>
+                                            <td>{member.order}</td>
                                             <td>
-                                                {member.date}, {member.time}
+                                                {member.is_core}
                                             </td>
-                                            <td>
-                                                <span className="d-flex flex-column">
-                                                    <a
-                                                        target="_blank"
-                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${member.thumbnail}`}
-                                                    >
-                                                        Thumbnail
-                                                    </a>
-                                                    <a
-                                                        target="_blank"
-                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${member.image1}`}
-                                                    >
-                                                        Image 1
-                                                    </a>
-                                                    <a
-                                                        target="_blank"
-                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${member.image2}`}
-                                                    >
-                                                        Image 2
-                                                    </a>
-                                                </span>
-                                            </td>
+                                            
                                             <td>
                                                 <span className="d-flex flex-column">
                                                     <a
