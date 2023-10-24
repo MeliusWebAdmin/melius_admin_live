@@ -1,9 +1,129 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, Container, Modal } from "react-bootstrap";
+import {
+    Button,
+    Table,
+    Container,
+    Modal,
+    Form,
+    FloatingLabel,
+    Alert,
+} from "react-bootstrap";
+import api from "./api/axios";
 
 function Members() {
-    //? create and update
-    // name, image, position, instagram, linkedin, course, order
+    //? create and update members
+    // name, image, position, instagram, linkedin, course, order, is_public, is_active, is_core
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [formData, setFormData] = useState({
+        name: "",
+        image: null,
+        position: "",
+        instagram: "",
+        linkedin: "",
+        course: "",
+        order: 1,
+        is_active: false,
+        is_public: false,
+        is_core: false,
+    });
+    const resetFormData = () => {
+        formData.name = "";
+        formData.image = null;
+        formData.position = "";
+        formData.instagram = "";
+        formData.linkedin = "";
+        formData.course = "";
+        formData.order = 1;
+        formData.is_active = false;
+        formData.is_public = false;
+        formData.is_core = false;
+    };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+    const handleFileChange = (e) => {
+        const { name, files } = e.target;
+        setFormData({ ...formData, [name]: files[0] });
+    };
+
+    const handleCheckboxChange = (e) => {
+        const { name, checked } = e.target;
+        setFormData({ ...formData, [name]: checked });
+    };
+
+    const handleSubmitCreate = (e) => {
+        e.preventDefault();
+        const formDataToSend = new FormData();
+
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("image", formData.image);
+        formDataToSend.append("position", formData.position);
+        formDataToSend.append("instagram", formData.instagram);
+        formDataToSend.append("linkedin", formData.linkedin);
+        formDataToSend.append("course", formData.course);
+        formDataToSend.append("order", formData.order);
+        formDataToSend.append("is_active", formData.is_active);
+        formDataToSend.append("is_public", formData.is_public);
+        formDataToSend.append("is_core", formData.is_core);
+
+        const endpoint = "admin/members/";
+        api.post(endpoint, formDataToSend, {
+            headers: { "Content-Type": "multipart/form-data" },
+        })
+            .then((res) => {
+                setSuccessMsg(res.data);
+                setShowCreateModal(false);
+                resetFormData();
+                setTimeout(() => {
+                    setSuccessMsg("");
+                }, 2000);
+            })
+            .catch((err) => {
+                setShowCreateModal(false);
+                setErrorMsg(err.response.data.error);
+                setTimeout(() => {
+                    setErrorMsg("");
+                }, 2000);
+            });
+    };
+
+    const handleSubmitUpdate = (e) => {
+        e.preventDefault();
+        const formDataToSend = new FormData();
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("image", formData.image);
+        formDataToSend.append("position", formData.position);
+        formDataToSend.append("instagram", formData.instagram);
+        formDataToSend.append("linkedin", formData.linkedin);
+        formDataToSend.append("course", formData.course);
+        formDataToSend.append("order", formData.order);
+        formDataToSend.append("is_active", formData.is_active);
+        formDataToSend.append("is_public", formData.is_public);
+        formDataToSend.append("is_core", formData.is_core);
+
+        const endpoint = `/admin/members/`;
+        api.put(endpoint, formDataToSend, {
+            headers: { "Content-Type": "multipart/form-data" },
+        })
+            .then((res) => {
+                console.log(res.data);
+                // setSuccessMsg(res.data.message);
+                // setShowUpdateModal(false);
+                // resetFormData();
+                // setTimeout(() => {
+                //     setSuccessMsg("");
+                // }, 2000);
+            })
+            .catch((err) => {
+                setShowUpdateModal(false);
+                setErrorMsg(err.response.data.error);
+                setTimeout(() => {
+                    setErrorMsg("");
+                }, 2000);
+            });
+    };
 
     const [projects, setProjects] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -11,25 +131,34 @@ function Members() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
 
-    // Sample data for initial projects
-    const initialProjects = [
-        { id: 1, name: "Member 1", description: "Description for Member 1" },
-        { id: 2, name: "Member 2", description: "Description for Member 2" },
-    ];
-
     useEffect(() => {
         // Load projects from an API or database here
-        setProjects(initialProjects);
-    }, []);
-
-    const handleCreate = () => {
-        // Implement your create project logic here
-        setShowCreateModal(true);
-    };
+        api.get("admin/members/").then((res) => {
+            setProjects(res.data);
+            if (res.data.length === 0) {
+                setErrorMsg("No Events Found");
+                setTimeout(() => {
+                    setErrorMsg("");
+                }, 2000);
+                setProjects([{}]);
+            }
+        });
+    }, [successMsg]);
 
     const handleUpdate = (project) => {
         // Set the selected project and show the update modal
         setSelectedProject(project);
+        formData.name = project.name;
+        formData.image = null;
+        formData.position = project.position;
+        formData.instagram = project.instagram;
+        formData.linkedin = project.linkedin;
+        formData.course = project.course;
+        formData.order = project.order;
+        formData.is_active = project.is_active;
+        formData.is_public = project.is_public;
+        formData.is_core = project.is_core;
+
         setShowUpdateModal(true);
     };
 
@@ -40,8 +169,21 @@ function Members() {
     };
 
     const confirmDelete = () => {
-        // Implement your delete project logic here
-        // You can use the selectedProject object to identify the project to delete
+        // Delete the project from the database
+        api.delete(`/admin/blog_posts/${selectedProject.id}`)
+            .then((res) => {
+                setSuccessMsg(res.data.message);
+                resetFormData();
+                setTimeout(() => {
+                    setSuccessMsg("");
+                }, 2000);
+            })
+            .catch((err) => {
+                setErrorMsg("An Error Occured. Please try again later.");
+                setTimeout(() => {
+                    setErrorMsg("");
+                }, 2000);
+            });
         setShowDeleteModal(false);
     };
 
@@ -50,53 +192,269 @@ function Members() {
             <h1>Members Page</h1>
 
             <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-                Create Project
+                Add Member
             </Button>
 
-            <Table striped bordered hover className="mt-3">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {projects.map((project) => (
-                        <tr key={project.id}>
-                            <td>{project.id}</td>
-                            <td>{project.name}</td>
-                            <td>{project.description}</td>
-                            <td>
-                                <Button
-                                    variant="primary"
-                                    onClick={() => handleUpdate(project)}
-                                >
-                                    Update
-                                </Button>{" "}
-                                <Button
-                                    variant="danger"
-                                    onClick={() => handleDelete(project)}
-                                >
-                                    Delete
-                                </Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
+            <Alert
+                variant="success"
+                className="my-2 text-capitalize"
+                hidden={successMsg?.length === 0}
+            >
+                {successMsg}
+            </Alert>
+
+            <Alert
+                variant="danger"
+                className="my-2 text-capitalize"
+                hidden={errorMsg?.length === 0}
+            >
+                {errorMsg}
+            </Alert>
+
+            {projects.length === 0 ? (
+                <div className="d-flex align-items-center justify-content-between p-2 bg-light my-3">
+                    <strong>Loading...</strong>
+                    <div
+                        className="spinner-border ml-auto"
+                        role="status"
+                        aria-hidden="true"
+                    ></div>
+                </div>
+            ) : (
+                <div className="table-responsive">
+                    <Table bordered className="my-3">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Venue</th>
+                                <th>Mode</th>
+                                <th>Date and Time</th>
+                                <th>Images</th>
+                                <th>Links</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {projects.map(
+                                (project, index) =>
+                                    project.id && (
+                                        <tr key={index + 1}>
+                                            <td>{index + 1}</td>
+                                            <td>{project.name}</td>
+                                            <td>{project.course}</td>
+                                            <td>{project.venue}</td>
+                                            <td>{project.mode}</td>
+                                            <td>
+                                                {project.date}, {project.time}
+                                            </td>
+                                            <td>
+                                                <span className="d-flex flex-column">
+                                                    <a
+                                                        target="_blank"
+                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${project.thumbnail}`}
+                                                    >
+                                                        Thumbnail
+                                                    </a>
+                                                    <a
+                                                        target="_blank"
+                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${project.image1}`}
+                                                    >
+                                                        Image 1
+                                                    </a>
+                                                    <a
+                                                        target="_blank"
+                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${project.image2}`}
+                                                    >
+                                                        Image 2
+                                                    </a>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className="d-flex flex-column">
+                                                    <a
+                                                        target="_blank"
+                                                        href={
+                                                            project.instagram_link
+                                                        }
+                                                    >
+                                                        Instagram
+                                                    </a>
+                                                    <a
+                                                        target="_blank"
+                                                        href={
+                                                            project.linkedin_link
+                                                        }
+                                                    >
+                                                        Linkedin
+                                                    </a>
+                                                    <a
+                                                        target="_blank"
+                                                        href={project.pdf_link}
+                                                    >
+                                                        PDF Link
+                                                    </a>
+                                                    <a
+                                                        target="_blank"
+                                                        href={
+                                                            project.drive_link
+                                                        }
+                                                    >
+                                                        Drive Link
+                                                    </a>
+                                                </span>
+                                            </td>
+                                            <td className="d-flex flex-column gap-2">
+                                                <Button
+                                                    variant="primary"
+                                                    onClick={() =>
+                                                        handleUpdate(project)
+                                                    }
+                                                >
+                                                    Update
+                                                </Button>{" "}
+                                                <Button
+                                                    variant="danger"
+                                                    onClick={() =>
+                                                        handleDelete(project)
+                                                    }
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    )
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+            )}
 
             {/* Create Project Modal */}
             <Modal
                 show={showCreateModal}
+                backdrop="static"
                 onHide={() => setShowCreateModal(false)}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Create Project</Modal.Title>
+                    <Modal.Title>Add Member</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {/* Add your create project form here */}
+                    <Container>
+                        <Form
+                            onSubmit={handleSubmitCreate}
+                            className="d-flex flex-column gap-2"
+                        >
+                            <FloatingLabel controlId="name" label="Name">
+                                <Form.Control
+                                    type="text"
+                                    name="name"
+                                    placeholder="Name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+
+                            <FloatingLabel controlId="course" label="Course">
+                                <Form.Control
+                                    type="text"
+                                    name="course"
+                                    placeholder="Course"
+                                    value={formData.course}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+                            <Form.Group controlId="image">
+                                <Form.Label>Image</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    name="image"
+                                    onChange={handleFileChange}
+                                />
+                            </Form.Group>
+
+                            <FloatingLabel
+                                controlId="position"
+                                label="Position"
+                            >
+                                <Form.Control
+                                    type="text"
+                                    name="position"
+                                    placeholder="Position"
+                                    value={formData.position}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+                            <FloatingLabel
+                                controlId="instagram"
+                                label="Instagram Link"
+                            >
+                                <Form.Control
+                                    type="text"
+                                    name="instagram"
+                                    value={formData.instagram}
+                                    placeholder="Instagram Link"
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+                            <FloatingLabel
+                                controlId="linkedin"
+                                label="Linkedin Link"
+                            >
+                                <Form.Control
+                                    type="text"
+                                    name="linkedin"
+                                    value={formData.linkedin}
+                                    placeholder="Linkedin Link"
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+
+                            <FloatingLabel controlId="order" label="Order">
+                                <Form.Control
+                                    type="number"
+                                    name="order"
+                                    placeholder="Order"
+                                    value={formData.order}
+                                    min={1}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+
+                            <Form.Group controlId="is_public" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Is Public"
+                                    name="is_public"
+                                    checked={formData.is_public}
+                                    onChange={handleCheckboxChange}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="is_core" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Is Core"
+                                    name="is_core"
+                                    checked={formData.is_core}
+                                    onChange={handleCheckboxChange}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="is_active" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Is Active"
+                                    name="is_active"
+                                    checked={formData.is_active}
+                                    onChange={handleCheckboxChange}
+                                />
+                            </Form.Group>
+
+                            <Button variant="primary" type="submit">
+                                Submit
+                            </Button>
+                        </Form>
+                    </Container>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
@@ -105,46 +463,161 @@ function Members() {
                     >
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleCreate}>
-                        Create
-                    </Button>
                 </Modal.Footer>
             </Modal>
 
             {/* Update Project Modal */}
             <Modal
                 show={showUpdateModal}
-                onHide={() => setShowUpdateModal(false)}
+                backdrop="static"
+                onHide={() => {
+                    resetFormData();
+                    setShowUpdateModal(false);
+                }}
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Update Project</Modal.Title>
+                    <Modal.Title>Update Event</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {/* Add your update project form here */}
+                    <Container>
+                        <Form
+                            onSubmit={handleSubmitUpdate}
+                            className="d-flex flex-column gap-2"
+                        >
+                            <FloatingLabel controlId="name" label="Name">
+                                <Form.Control
+                                    type="text"
+                                    name="name"
+                                    placeholder="Name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+
+                            <FloatingLabel controlId="course" label="Course">
+                                <Form.Control
+                                    type="text"
+                                    name="course"
+                                    placeholder="Course"
+                                    value={formData.course}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+                            <Form.Group controlId="image">
+                                <Form.Label>Image</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    name="image"
+                                    onChange={handleFileChange}
+                                />
+                            </Form.Group>
+
+                            <FloatingLabel
+                                controlId="position"
+                                label="Position"
+                            >
+                                <Form.Control
+                                    type="text"
+                                    name="position"
+                                    placeholder="Position"
+                                    value={formData.position}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+                            <FloatingLabel
+                                controlId="instagram"
+                                label="Instagram Link"
+                            >
+                                <Form.Control
+                                    type="text"
+                                    name="instagram"
+                                    value={formData.instagram}
+                                    placeholder="Instagram Link"
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+                            <FloatingLabel
+                                controlId="linkedin"
+                                label="Linkedin Link"
+                            >
+                                <Form.Control
+                                    type="text"
+                                    name="linkedin"
+                                    value={formData.linkedin}
+                                    placeholder="Linkedin Link"
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+
+                            <FloatingLabel controlId="order" label="Order">
+                                <Form.Control
+                                    type="number"
+                                    name="order"
+                                    placeholder="Order"
+                                    value={formData.order}
+                                    min={1}
+                                    onChange={handleInputChange}
+                                />
+                            </FloatingLabel>
+
+                            <Form.Group controlId="is_public" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Is Public"
+                                    name="is_public"
+                                    checked={formData.is_public}
+                                    onChange={handleCheckboxChange}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="is_core" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Is Core"
+                                    name="is_core"
+                                    checked={formData.is_core}
+                                    onChange={handleCheckboxChange}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="is_active" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="Is Active"
+                                    name="is_active"
+                                    checked={formData.is_active}
+                                    onChange={handleCheckboxChange}
+                                />
+                            </Form.Group>
+
+                            <Button variant="primary" type="submit">
+                                Submit
+                            </Button>
+                        </Form>
+                    </Container>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
                         variant="secondary"
-                        onClick={() => setShowUpdateModal(false)}
+                        onClick={() => {
+                            resetFormData();
+                            setShowUpdateModal(false);
+                        }}
                     >
                         Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleUpdate}>
-                        Update
                     </Button>
                 </Modal.Footer>
             </Modal>
             {/* Delete Project Modal */}
             <Modal
                 show={showDeleteModal}
+                backdrop="static"
                 onHide={() => setShowDeleteModal(false)}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Delete Project</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete the project "
-                    {selectedProject?.name}"?
+                    Are you sure you want to delete the event "
+                    {selectedProject?.title}"?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
