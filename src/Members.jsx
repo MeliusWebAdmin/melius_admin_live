@@ -103,18 +103,17 @@ function Members() {
         formDataToSend.append("is_public", formData.is_public);
         formDataToSend.append("is_core", formData.is_core);
 
-        const endpoint = `/admin/members/`;
+        const endpoint = `/admin/members/?id=${selectedMember.id}`;
         api.put(endpoint, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         })
             .then((res) => {
-                console.log(res.data);
-                // setSuccessMsg(res.data.message);
-                // setShowUpdateModal(false);
-                // resetFormData();
-                // setTimeout(() => {
-                //     setSuccessMsg("");
-                // }, 2000);
+                setSuccessMsg(res.data.msg);
+                setShowUpdateModal(false);
+                resetFormData();
+                setTimeout(() => {
+                    setSuccessMsg("");
+                }, 2000);
             })
             .catch((err) => {
                 setShowUpdateModal(false);
@@ -125,54 +124,54 @@ function Members() {
             });
     };
 
-    const [projects, setProjects] = useState([]);
+    const [members, setMembers] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedProject, setSelectedProject] = useState(null);
+    const [selectedMember, setSelectedMember] = useState(null);
 
     useEffect(() => {
         // Load projects from an API or database here
         api.get("admin/members/").then((res) => {
-            setProjects(res.data);
+            setMembers(res.data);
             if (res.data.length === 0) {
                 setErrorMsg("No Events Found");
                 setTimeout(() => {
                     setErrorMsg("");
                 }, 2000);
-                setProjects([{}]);
+                setMembers([{}]);
             }
         });
     }, [successMsg]);
 
-    const handleUpdate = (project) => {
+    const handleUpdate = (member) => {
         // Set the selected project and show the update modal
-        setSelectedProject(project);
-        formData.name = project.name;
+        setSelectedMember(member);
+        formData.name = member.name;
         formData.image = null;
-        formData.position = project.position;
-        formData.instagram = project.instagram;
-        formData.linkedin = project.linkedin;
-        formData.course = project.course;
-        formData.order = project.order;
-        formData.is_active = project.is_active;
-        formData.is_public = project.is_public;
-        formData.is_core = project.is_core;
+        formData.position = member.position;
+        formData.instagram = member.instagram;
+        formData.linkedin = member.linkedin;
+        formData.course = member.course;
+        formData.order = member.order;
+        formData.is_active = member.is_active;
+        formData.is_public = member.is_public;
+        formData.is_core = member.is_core;
 
         setShowUpdateModal(true);
     };
 
-    const handleDelete = (project) => {
+    const handleDelete = (member) => {
         // Set the selected project and show the delete modal
-        setSelectedProject(project);
+        setSelectedMember(member);
         setShowDeleteModal(true);
     };
 
     const confirmDelete = () => {
         // Delete the project from the database
-        api.delete(`/admin/blog_posts/${selectedProject.id}`)
+        api.delete(`/admin/members/?id=${selectedMember.id}`)
             .then((res) => {
-                setSuccessMsg(res.data.message);
+                setSuccessMsg(res.data);
                 resetFormData();
                 setTimeout(() => {
                     setSuccessMsg("");
@@ -211,7 +210,7 @@ function Members() {
                 {errorMsg}
             </Alert>
 
-            {projects.length === 0 ? (
+            {members.length === 0 ? (
                 <div className="d-flex align-items-center justify-content-between p-2 bg-light my-3">
                     <strong>Loading...</strong>
                     <div
@@ -237,35 +236,35 @@ function Members() {
                             </tr>
                         </thead>
                         <tbody>
-                            {projects.map(
-                                (project, index) =>
-                                    project.id && (
+                            {members.map(
+                                (member, index) =>
+                                    member.id && (
                                         <tr key={index + 1}>
                                             <td>{index + 1}</td>
-                                            <td>{project.name}</td>
-                                            <td>{project.course}</td>
-                                            <td>{project.venue}</td>
-                                            <td>{project.mode}</td>
+                                            <td>{member.name}</td>
+                                            <td>{member.course}</td>
+                                            <td>{member.venue}</td>
+                                            <td>{member.mode}</td>
                                             <td>
-                                                {project.date}, {project.time}
+                                                {member.date}, {member.time}
                                             </td>
                                             <td>
                                                 <span className="d-flex flex-column">
                                                     <a
                                                         target="_blank"
-                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${project.thumbnail}`}
+                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${member.thumbnail}`}
                                                     >
                                                         Thumbnail
                                                     </a>
                                                     <a
                                                         target="_blank"
-                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${project.image1}`}
+                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${member.image1}`}
                                                     >
                                                         Image 1
                                                     </a>
                                                     <a
                                                         target="_blank"
-                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${project.image2}`}
+                                                        href={`https://meliuswebsite.pythonanywhere.com/api/blog_pictures/${member.image2}`}
                                                     >
                                                         Image 2
                                                     </a>
@@ -276,7 +275,7 @@ function Members() {
                                                     <a
                                                         target="_blank"
                                                         href={
-                                                            project.instagram_link
+                                                            member.instagram_link
                                                         }
                                                     >
                                                         Instagram
@@ -284,22 +283,20 @@ function Members() {
                                                     <a
                                                         target="_blank"
                                                         href={
-                                                            project.linkedin_link
+                                                            member.linkedin_link
                                                         }
                                                     >
                                                         Linkedin
                                                     </a>
                                                     <a
                                                         target="_blank"
-                                                        href={project.pdf_link}
+                                                        href={member.pdf_link}
                                                     >
                                                         PDF Link
                                                     </a>
                                                     <a
                                                         target="_blank"
-                                                        href={
-                                                            project.drive_link
-                                                        }
+                                                        href={member.drive_link}
                                                     >
                                                         Drive Link
                                                     </a>
@@ -309,7 +306,7 @@ function Members() {
                                                 <Button
                                                     variant="primary"
                                                     onClick={() =>
-                                                        handleUpdate(project)
+                                                        handleUpdate(member)
                                                     }
                                                 >
                                                     Update
@@ -317,7 +314,7 @@ function Members() {
                                                 <Button
                                                     variant="danger"
                                                     onClick={() =>
-                                                        handleDelete(project)
+                                                        handleDelete(member)
                                                     }
                                                 >
                                                     Delete
@@ -617,7 +614,7 @@ function Members() {
                 </Modal.Header>
                 <Modal.Body>
                     Are you sure you want to delete the event "
-                    {selectedProject?.title}"?
+                    {selectedMember?.title}"?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
