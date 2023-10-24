@@ -45,7 +45,7 @@ function Events() {
         formData.mode = "";
         formData.date = "";
         formData.time = "";
-        formData.is_public = false;
+        formData.is_public = 0;
     };
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -58,7 +58,7 @@ function Events() {
 
     const handleCheckboxChange = (e) => {
         const { name, checked } = e.target;
-        setFormData({ ...formData, [name]: checked });
+        setFormData({ ...formData, [name]: checked ? 1 : 0 });
     };
 
     const handleSubmitCreate = (e) => {
@@ -169,6 +169,8 @@ function Events() {
     const handleUpdate = (project) => {
         // Set the selected project and show the update modal
         setSelectedProject(project);
+        project.is_public = project.is_public ? 1 : 0;
+
         formData.date = project.date;
         formData.description = project.description;
         formData.drive_link = project.drive_link;
@@ -359,7 +361,10 @@ function Events() {
             <Modal
                 show={showCreateModal}
                 backdrop="static"
-                onHide={() => setShowCreateModal(false)}
+                onHide={() => {
+                    resetFormData();
+                    setShowCreateModal(false);
+                }}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Create Event</Modal.Title>
@@ -519,7 +524,10 @@ function Events() {
                 <Modal.Footer>
                     <Button
                         variant="secondary"
-                        onClick={() => setShowCreateModal(false)}
+                        onClick={() => {
+                            resetFormData();
+                            setShowCreateModal(false);
+                        }}
                     >
                         Cancel
                     </Button>
@@ -530,7 +538,10 @@ function Events() {
             <Modal
                 show={showUpdateModal}
                 backdrop="static"
-                onHide={() => setShowUpdateModal(false)}
+                onHide={() => {
+                    resetFormData();
+                    setShowUpdateModal(false);
+                }}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Update Event</Modal.Title>
@@ -690,7 +701,10 @@ function Events() {
                 <Modal.Footer>
                     <Button
                         variant="secondary"
-                        onClick={() => setShowUpdateModal(false)}
+                        onClick={() => {
+                            resetFormData();
+                            setShowUpdateModal(false);
+                        }}
                     >
                         Cancel
                     </Button>

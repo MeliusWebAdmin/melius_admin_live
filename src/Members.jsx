@@ -23,9 +23,9 @@ function Members() {
         linkedin: "",
         course: "",
         order: 1,
-        is_active: false,
-        is_public: false,
-        is_core: false,
+        is_active: 0,
+        is_public: 0,
+        is_core: 0,
     });
     const resetFormData = () => {
         formData.name = "";
@@ -35,9 +35,9 @@ function Members() {
         formData.linkedin = "";
         formData.course = "";
         formData.order = 1;
-        formData.is_active = false;
-        formData.is_public = false;
-        formData.is_core = false;
+        formData.is_active = 0;
+        formData.is_public = 0;
+        formData.is_core = 0;
     };
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -50,7 +50,7 @@ function Members() {
 
     const handleCheckboxChange = (e) => {
         const { name, checked } = e.target;
-        setFormData({ ...formData, [name]: checked });
+        setFormData({ ...formData, [name]: checked ? 1 : 0 });
     };
 
     const handleSubmitCreate = (e) => {
@@ -134,6 +134,7 @@ function Members() {
         // Load projects from an API or database here
         api.get("admin/members/").then((res) => {
             setMembers(res.data);
+
             if (res.data.length === 0) {
                 setErrorMsg("No Events Found");
                 setTimeout(() => {
@@ -147,6 +148,9 @@ function Members() {
     const handleUpdate = (member) => {
         // Set the selected project and show the update modal
         setSelectedMember(member);
+        member.is_active = member.is_active ? 1 : 0;
+        member.is_public = member.is_public ? 1 : 0;
+        member.is_core = member.is_core ? 1 : 0;
         formData.name = member.name;
         formData.image = null;
         formData.position = member.position;
