@@ -13,6 +13,11 @@ import api from "./api/axios";
 function Projects() {
     const [successMsg, setSuccessMsg] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
+    const [projects, setProjects] = useState([]);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -57,7 +62,6 @@ function Projects() {
         // Append file data to the FormData object
         formDataToSend.append("photo", formData.photo);
 
-
         // Append other form data
         formDataToSend.append("name", formData.name);
         formDataToSend.append("brief", formData.brief);
@@ -96,7 +100,6 @@ function Projects() {
         // Append file data to the FormData object
         formDataToSend.append("photo", formData.photo);
 
-
         // Append other form data
         formDataToSend.append("name", formData.name);
         formDataToSend.append("brief", formData.brief);
@@ -107,8 +110,7 @@ function Projects() {
         formDataToSend.append("date", formData.date);
         formDataToSend.append("is_public", formData.is_public);
 
-
-        const endpoint = `/admin/project/?=${selectedProject.id}`;
+        const endpoint = `/admin/project/?id=${selectedProject.id}`;
         api.put(endpoint, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         })
@@ -128,12 +130,6 @@ function Projects() {
                 }, 2000);
             });
     };
-
-    const [projects, setProjects] = useState([]);
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [showUpdateModal, setShowUpdateModal] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedProject, setSelectedProject] = useState(null);
 
     useEffect(() => {
         // Load projects from an API or database here
@@ -158,8 +154,8 @@ function Projects() {
         formData.date = project.date;
         formData.brief = project.brief;
         formData.photo = project.photo;
-        formData.instagram_link = project.instagram_link;
-        formData.linkedin_link = project.linkedin_link;
+        formData.instagram_link = project.instagram;
+        formData.linkedin_link = project.linkedin;
         formData.pdf_link = project.pdf_link;
         formData.name = project.name;
         formData.partner = project.partner;
@@ -175,7 +171,7 @@ function Projects() {
 
     const confirmDelete = () => {
         // Delete the project from the database
-   
+
         api.delete(`/admin/project/?id=${selectedProject.id}`)
             .then((res) => {
                 setSuccessMsg(res.data.message);
@@ -198,7 +194,7 @@ function Projects() {
             <h1>Projects Page</h1>
 
             <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-            Create Project            
+                Create Project
             </Button>
 
             <Alert
@@ -394,10 +390,7 @@ function Projects() {
                                     onChange={handleFileChange}
                                 />
                             </Form.Group>
-                            
 
-                           
-                            
                             <FloatingLabel
                                 controlId="instagram_link"
                                 label="Instagram Link"
@@ -434,8 +427,7 @@ function Projects() {
                                     onChange={handleInputChange}
                                 />
                             </FloatingLabel>
-                            
-                            
+
                             <FloatingLabel controlId="date" label="Date">
                                 <Form.Control
                                     type="date"
@@ -444,7 +436,7 @@ function Projects() {
                                     onChange={handleInputChange}
                                 />
                             </FloatingLabel>
-                            
+
                             <Form.Group controlId="is_public" className="mb-3">
                                 <Form.Check
                                     type="checkbox"
@@ -483,7 +475,7 @@ function Projects() {
                     setShowUpdateModal(false);
                 }}
             >
-                 <Modal.Header closeButton>
+                <Modal.Header closeButton>
                     <Modal.Title>Create Project</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -533,10 +525,7 @@ function Projects() {
                                     onChange={handleFileChange}
                                 />
                             </Form.Group>
-                            
 
-                           
-                            
                             <FloatingLabel
                                 controlId="instagram_link"
                                 label="Instagram Link"
@@ -573,8 +562,7 @@ function Projects() {
                                     onChange={handleInputChange}
                                 />
                             </FloatingLabel>
-                            
-                            
+
                             <FloatingLabel controlId="date" label="Date">
                                 <Form.Control
                                     type="date"
@@ -583,7 +571,7 @@ function Projects() {
                                     onChange={handleInputChange}
                                 />
                             </FloatingLabel>
-                            
+
                             <Form.Group controlId="is_public" className="mb-3">
                                 <Form.Check
                                     type="checkbox"
@@ -641,5 +629,4 @@ function Projects() {
     );
 }
 
-export default Projects ;
-
+export default Projects;
