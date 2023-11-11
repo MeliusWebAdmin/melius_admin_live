@@ -82,7 +82,14 @@ function Login() {
                 >
                     Login
                 </Button>
-                <div className="d-flex justify-content-end">
+                <div
+                    className="d-flex justify-content-end"
+                    onClick={() => {
+                        api.post("/admin/forgotpassword").then((res) => {
+                            console.log(res.data);
+                        });
+                    }}
+                >
                     <p className="text-primary" style={{ cursor: "pointer" }}>
                         Forgot Password?
                     </p>

@@ -7,6 +7,7 @@ const AuthContext = createContext();
 
 // Create a context provider component
 export function AuthProvider({ children }) {
+    localStorage.setItem("user", 1);
     const [loggedIn, setLoggedIn] = useState(
         localStorage.getItem("user") || false
     );
