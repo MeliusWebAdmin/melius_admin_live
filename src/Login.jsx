@@ -85,9 +85,18 @@ function Login() {
                 <div
                     className="d-flex justify-content-end"
                     onClick={() => {
-                        api.post("/admin/forgotpassword").then((res) => {
-                            console.log(res.data);
-                        });
+                        // take value of username from prompt
+
+                        const username = prompt("Enter your username");
+                        api.post("/admin/forgotpassword", {
+                            username: username,
+                        })
+                            .then((res) => {
+                                setSuccessMsg(res.response.data.msg);
+                            })
+                            .catch((err) => {
+                                setErrorMsg(err.response.data.msg);
+                            });
                     }}
                 >
                     <p className="text-primary" style={{ cursor: "pointer" }}>
