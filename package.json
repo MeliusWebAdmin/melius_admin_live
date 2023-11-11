@@ -2,7 +2,7 @@
   "name": "melius-website-admin",
   "version": "0.0.0",
   "private": true,
-  "homepage": "/",
+  "homepage": "https://melius-website-admin.vercel.app/",
   "type": "module",
   "scripts": {
     "dev": "vite",
