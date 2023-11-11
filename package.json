@@ -1,6 +1,8 @@
 {
   "name": "melius-website-admin",
   "version": "0.0.0",
+  "private": true,
+  "homepage": "/",
   "type": "module",
   "scripts": {
     "dev": "vite",
