@@ -437,13 +437,13 @@ function Events() {
                             </FloatingLabel>
                             <FloatingLabel
                                 controlId="linkedin_link"
-                                label="Linkedin Link"
+                                label="Google form or Whatsapp group"
                             >
                                 <Form.Control
                                     type="text"
                                     name="linkedin_link"
                                     value={formData.linkedin_link}
-                                    placeholder="Linkedin Link"
+                                    placeholder="form or wp group"
                                     onChange={handleInputChange}
                                 />
                             </FloatingLabel>
@@ -614,13 +614,13 @@ function Events() {
                             </FloatingLabel>
                             <FloatingLabel
                                 controlId="linkedin_link"
-                                label="Linkedin Link"
+                                label="Google form or Whatsapp group"
                             >
                                 <Form.Control
                                     type="text"
                                     name="linkedin_link"
                                     value={formData.linkedin_link || ""}
-                                    placeholder="Linkedin Link"
+                                    placeholder="form or wp group"
                                     onChange={handleInputChange}
                                 />
                             </FloatingLabel>
